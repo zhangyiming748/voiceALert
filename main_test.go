@@ -7,7 +7,7 @@ import (
 )
 
 func TestVoice(t *testing.T) {
-	VoiceAlert(1)
+	Voice(1)
 }
 func BenchmarkVoiceAlert(b *testing.B) {
 	rand.Seed(time.Now().Unix())
