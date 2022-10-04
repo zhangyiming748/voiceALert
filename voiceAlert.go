@@ -1,6 +1,7 @@
 package voiceAlert
 
 import (
+	"github.com/zhangyiming748/voiceAlert/util"
 	"os/exec"
 	"runtime"
 )
@@ -16,18 +17,19 @@ func VoiceAlert(msg int) {
 	switch runtime.GOOS {
 	case "darwin":
 		// 查询发音人 `say -v ?`
+		voice := "Kate"
+		if !util.HasSpoker("Kate") {
+			voice = "Victoria"
+		}
 		switch msg {
 		case success:
-			//cmd = exec.Command("say", "-v", "Kate", "Rocket was launched successfully")
-			cmd = exec.Command("say", "-v", "Victoria", "Rocket was launched successfully")
+			cmd = exec.Command("say", "-v", voice, "Rocket was launched successfully")
 			cmd.Start()
 		case failed:
-			//cmd = exec.Command("say", "-v", "Bad News", "Rocket launch failed")
-			cmd = exec.Command("say", "-v", "Victoria", "Rocket launch failed")
+			cmd = exec.Command("say", "-v", voice, "Rocket launch failed")
 			cmd.Start()
 		case complete:
-			//cmd = exec.Command("say", "-v", "Kate", "mission complete!")
-			cmd = exec.Command("say", "-v", "Victoria", "mission complete!")
+			cmd = exec.Command("say", "-v", voice, "mission complete!")
 			cmd.Start()
 		}
 	case "linux":
