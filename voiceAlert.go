@@ -12,7 +12,7 @@ const (
 	complete            // 转码进程完成
 )
 
-func VoiceAlert(msg int) {
+func Voice(msg int) {
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "darwin":
