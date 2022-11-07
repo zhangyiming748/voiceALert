@@ -18,7 +18,7 @@ func Voice(msg int) {
 	switch runtime.GOOS {
 	case "darwin":
 		// 查询发音人 `say -v ?`
-		voice := "Kate"
+		voice := "Serena"
 		if !HasSpoker(voice) {
 			voice = "Victoria"
 		}
