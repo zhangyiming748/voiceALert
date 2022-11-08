@@ -2,6 +2,7 @@ package voiceAlert
 
 import (
 	"golang.org/x/exp/slog"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
@@ -15,8 +16,20 @@ const (
 )
 
 func Voice(msg int) {
-	//slog.SetDefault(slog.New(slog.NewJSONHandler(io.MultiWriter(logf, os.Stdout))))
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout)))
+	lvl := &slog.HandlerOptions{
+		Level:     slog.DebugLevel,
+		AddSource: true,
+	}
+	logf, _ := os.OpenFile("voiceAlert.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
+
+	//slog.SetDefault(slog.New(lvl.NewJSONHandler(os.Stdout)))
+	slog.SetDefault(slog.New(lvl.NewJSONHandler(io.MultiWriter(logf, os.Stdout))))
+
+	//slog.Info("info", "name", "Al")
+	//slog.Debug("debug", "name", "zen")
+	//slog.Warn("warning", "name", "none")
+	//slog.Error("oops", net.ErrClosed, "status", 500)
+
 	slog.Info("voice start!")
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
@@ -68,6 +81,8 @@ func Voice(msg int) {
 	}
 	if err := cmd.Wait(); err != nil {
 		slog.Warn("执行命令过程中发生错误", err)
+	} else {
+		slog.Debug("执行的命令", &cmd.Args)
 	}
 
 }
@@ -92,8 +107,6 @@ func HasSpoker(key string) bool {
 		if strings.Contains(t, key) {
 			slog.Info("found!", "voice", key)
 			return true
-		} else {
-			slog.Warn("not found!", "voice", key)
 		}
 		if err != nil {
 			break
