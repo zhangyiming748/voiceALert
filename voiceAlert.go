@@ -13,6 +13,12 @@ const (
 )
 
 func Voice(msg int) {
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Println("发生命令出现错误", err)
+		}
+	}()
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "darwin":
