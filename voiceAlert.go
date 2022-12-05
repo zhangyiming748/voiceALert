@@ -1,6 +1,7 @@
 package voiceAlert
 
 import (
+	"log"
 	"os/exec"
 	"runtime"
 )
