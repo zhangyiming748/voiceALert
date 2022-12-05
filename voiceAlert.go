@@ -25,32 +25,43 @@ func Voice(msg int) {
 		switch msg {
 		case success:
 			cmd = exec.Command("say", "-v", voice, "Rocket was launched successfully")
-			cmd.Start()
+			if err := cmd.Start(); err != nil {
+				log.Printf("执行发声命令发生错误:%v\n", err)
+			}
 		case failed:
 			cmd = exec.Command("say", "-v", voice, "Rocket launch failed")
-			cmd.Start()
+			if err := cmd.Start(); err != nil {
+				log.Printf("执行发声命令发生错误:%v\n", err)
+			}
 		case complete:
 			cmd = exec.Command("say", "-v", voice, "mission complete!")
-			cmd.Start()
+			if err := cmd.Start(); err != nil {
+				log.Printf("执行发声命令发生错误:%v\n", err)
+			}
 		}
 	case "linux":
-		cmd = exec.Command("echo", "-e", "\\a")
 		switch msg {
 		case success:
-			for i := 0; i < 2; i++ {
-				cmd.Start()
+			cmd = exec.Command("espeak", "Rocket was launched successfully")
+			if err := cmd.Start(); err != nil {
+				log.Printf("执行发声命令发生错误:%v\n", err)
 			}
 		case failed:
-			for i := 0; i < 50; i++ {
-				cmd.Start()
+			cmd = exec.Command("espeak", "Rocket launch failed")
+			if err := cmd.Start(); err != nil {
+				log.Printf("执行发声命令发生错误:%v\n", err)
 			}
 		case complete:
-			for i := 0; i < 100; i++ {
-				cmd.Start()
+			//espeak "enter the text that you want to listen to"
+			cmd = exec.Command("espeak", "mission complete!")
+			if err := cmd.Start(); err != nil {
+				log.Printf("执行发声命令发生错误:%v\n", err)
 			}
 		}
 	}
-	cmd.Wait()
+	if err := cmd.Wait(); err != nil {
+		log.Println("命令执行中有错误产生", err)
+	}
 }
 
 func HasSpoker(key string) bool {
