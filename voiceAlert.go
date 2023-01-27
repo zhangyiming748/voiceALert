@@ -1,6 +1,7 @@
 package voiceAlert
 
 import (
+	"github.com/zhangyiming748/log"
 	"os/exec"
 	"runtime"
 )
@@ -12,6 +13,11 @@ const (
 )
 
 func Voice(msg int) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Debug.Printf("执行发生命令出现错误:%v", err)
+		}
+	}()
 	var cmd *exec.Cmd
 	switch runtime.GOOS {
 	case "darwin":
