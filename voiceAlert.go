@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	success  = iota + 1 // 单次转码成功
-	failed              // 转码失败,程序退出
-	complete            // 转码进程完成
+	SUCCESS  = iota + 1 // 单次转码成功
+	FAILED              // 转码失败,程序退出
+	COMPLETE            // 转码进程完成
 )
 
 func Voice(msg int) {
@@ -19,28 +19,28 @@ func Voice(msg int) {
 		voice := "Serena"
 
 		switch msg {
-		case success:
+		case SUCCESS:
 			cmd = exec.Command("say", "-v", voice, "Rocket was launched successfully")
 			cmd.Start()
-		case failed:
-			cmd = exec.Command("say", "-v", voice, "Rocket launch failed")
+		case FAILED:
+			cmd = exec.Command("say", "-v", voice, "Rocket launch FAILED")
 			cmd.Start()
-		case complete:
-			cmd = exec.Command("say", "-v", voice, "mission complete!")
+		case COMPLETE:
+			cmd = exec.Command("say", "-v", voice, "mission COMPLETE!")
 			cmd.Start()
 		}
 	case "linux":
 		cmd = exec.Command("echo", "-e", "\\a")
 		switch msg {
-		case success:
+		case SUCCESS:
 			for i := 0; i < 2; i++ {
 				cmd.Start()
 			}
-		case failed:
+		case FAILED:
 			for i := 0; i < 50; i++ {
 				cmd.Start()
 			}
-		case complete:
+		case COMPLETE:
 			for i := 0; i < 100; i++ {
 				cmd.Start()
 			}
