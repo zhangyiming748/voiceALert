@@ -1,16 +1,13 @@
 package voiceAlert
 
 import (
+	"fmt"
 	"github.com/zhangyiming748/log"
+	"os"
 	"os/exec"
 	"runtime"
 )
 
-const (
-	SUCCESS  = iota + 1 // 单次转码成功
-	FAILED              // 转码失败,程序退出
-	COMPLETE            // 转码进程完成
-)
 const (
 	Default  = Serena
 	Allison  = "Allison"  // 深沉美式女声
@@ -28,61 +25,43 @@ const (
 	Victoria = "Victoria" // 性感美式女声
 )
 
-var (
-	cmd *exec.Cmd
-)
-
 /*
 运行在mac上的发声命令
 */
-func CustomizedOnMac(spoker, content string) {
+func customizedOnMac(spoker, content string) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Warn.Printf("执行发生命令出现错误:%v", err)
+			log.Warn.Printf("执行发生命令出现错误:%v\n", err)
 		}
 	}()
-	cmd = exec.Command("say", "-v", spoker, content)
+	cmd := exec.Command("say", "-v", spoker, content)
+	fmt.Println(cmd)
 	cmd.Run()
 }
 
 /*
 运行在linux上的发声命令
 */
-func CustomizedOnLinux(content string) {
+func customizedOnLinux(content string) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Warn.Printf("执行发生命令出现错误:%v", err)
+			log.Warn.Printf("执行发生命令出现错误:%v\t是否安装espeak?\n", err)
 		}
 	}()
 	//espeak "Testing espeak from the Ubuntu 18.04 terminal"
-	cmd = exec.Command("espeak", content)
+	cmd := exec.Command("espeak", "-v", "zh", content)
 	cmd.Run()
 }
-func Voice(msg int) {
-	defer func() {
-		log.Warn.Printf("这是一个即将废弃的函数\n请及时切换到CustomizedOnMac或CustomizedOnLinux函数\n")
-		if err := recover(); err != nil {
-			log.Debug.Printf("执行发生命令出现错误:%v", err)
-		}
-	}()
+func Customize(content, teller string) {
+	if os.Getenv("QUIET") == "True" {
+		return
+	}
 	switch runtime.GOOS {
 	case "darwin":
-		switch msg {
-		case SUCCESS:
-			CustomizedOnMac(Victoria, "Rocket was launched successfully")
-		case FAILED:
-			CustomizedOnMac(Victoria, "Rocket launch FAILED")
-		case COMPLETE:
-			CustomizedOnMac(Victoria, "Mission COMPLETE!")
-		}
+		customizedOnMac(teller, content)
 	case "linux":
-		switch msg {
-		case SUCCESS:
-			CustomizedOnLinux("Rocket was launched successfully")
-		case FAILED:
-			CustomizedOnLinux("Rocket launch FAILED")
-		case COMPLETE:
-			CustomizedOnLinux("Rocket launch FAILED")
-		}
+		customizedOnLinux(content)
+	default:
+		log.Warn.Panicf("系统问题\n")
 	}
 }
