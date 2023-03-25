@@ -2,7 +2,8 @@ package voiceAlert
 
 import (
 	"fmt"
-	"github.com/zhangyiming748/log"
+	"golang.org/x/exp/slog"
+	"io"
 	"os"
 	"os/exec"
 	"runtime"
@@ -25,13 +26,57 @@ const (
 	Victoria = "Victoria" // 性感美式女声
 )
 
+func init() {
+	logLevel := os.Getenv("LEVEL")
+	//var level slog.Level
+	var opt slog.HandlerOptions
+	switch logLevel {
+	case "Debug":
+		opt = slog.HandlerOptions{ // 自定义option
+			AddSource: true,
+			Level:     slog.LevelDebug, // slog 默认日志级别是 info
+		}
+	case "Info":
+		opt = slog.HandlerOptions{ // 自定义option
+			AddSource: true,
+			Level:     slog.LevelInfo, // slog 默认日志级别是 info
+		}
+	case "Warn":
+		opt = slog.HandlerOptions{ // 自定义option
+			AddSource: true,
+			Level:     slog.LevelWarn, // slog 默认日志级别是 info
+		}
+	case "Err":
+		opt = slog.HandlerOptions{ // 自定义option
+			AddSource: true,
+			Level:     slog.LevelError, // slog 默认日志级别是 info
+		}
+	default:
+		slog.Warn("需要正确设置环境变量 Debug,Info,Warn or Err")
+		slog.Info("默认使用Debug等级")
+		opt = slog.HandlerOptions{ // 自定义option
+			AddSource: true,
+			Level:     slog.LevelDebug, // slog 默认日志级别是 info
+		}
+
+	}
+	file := "voiceAlert.log"
+	logf, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	if err != nil {
+		panic(err)
+	}
+	//defer logf.Close() //如果不关闭可能造成内存泄露
+	logger := slog.New(opt.NewJSONHandler(io.MultiWriter(logf, os.Stdout)))
+	slog.SetDefault(logger)
+}
+
 /*
 运行在mac上的发声命令
 */
 func customizedOnMac(spoker, content string) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Warn.Printf("执行发生命令出现错误:%v\n", err)
+			slog.Warn("执行发声命令出现错误", slog.Any("错误信息", err))
 		}
 	}()
 	cmd := exec.Command("say", "-v", spoker, content)
@@ -45,7 +90,7 @@ func customizedOnMac(spoker, content string) {
 func customizedOnLinux(content string) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Warn.Printf("执行发生命令出现错误:%v\t是否安装espeak?\n", err)
+			slog.Warn("执行发声命令出现错误", slog.Any("是否安装espeak？", err))
 		}
 	}()
 	//espeak "Testing espeak from the Ubuntu 18.04 terminal"
@@ -62,6 +107,6 @@ func Customize(content, teller string) {
 	case "linux":
 		customizedOnLinux(content)
 	default:
-		log.Warn.Panicf("系统问题\n")
+		slog.Warn("系统问题")
 	}
 }
