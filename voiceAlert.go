@@ -35,7 +35,7 @@ func customizedOnMac(spoker, content string) {
 		}
 	}()
 	cmd := exec.Command("say", "-v", spoker, content)
-	fmt.Println(cmd)
+	slog.Debug("成功执行命令", slog.String("命令", fmt.Sprint(cmd)))
 	cmd.Run()
 }
 
